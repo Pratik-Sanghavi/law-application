@@ -23,7 +23,7 @@ export async function GET(req: NextRequest) {
   );
   if (!t.ok) return new NextResponse("Login failed", { status: 502 });
   const j = await t.json();
-  const r = NextResponse.redirect(new URL("/", req.url));
+  const r = NextResponse.redirect(new URL("/", process.env.APP_BASE_URL || req.nextUrl.origin));
   r.cookies.set("access_token", j.access_token, {
     httpOnly: true,
     sameSite: "lax",
