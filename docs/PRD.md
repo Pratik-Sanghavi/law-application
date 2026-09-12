@@ -1,4 +1,4 @@
-# Lead Management Platform — Product Requirements Document
+# Lead Management Platform â€” Product Requirements Document
 
 ## Purpose
 
@@ -45,6 +45,6 @@ Provide a dependable intake flow for prospective legal clients and an internal w
 
 1. A prospect can submit a valid lead and CV through the public URL.
 2. The lead and document remain available after pod restart.
-3. Notification workflows retry Mailgun failures without losing the lead.
+3. The intake API waits for Mailgun delivery after persisting the lead and retries each email up to three times with exponential backoff. If delivery still fails, it returns an error while retaining the lead for manual follow-up.
 4. An authenticated attorney can find a lead, download its CV, and mark it `REACHED_OUT`.
 5. Unauthorized users cannot access internal leads, documents, or internal APIs.
