@@ -9,7 +9,7 @@ spec:
     spec:
       containers:
         - name: web
-          image: localhost:5000/law/public-web:0.1.0
+          image: localhost:5000/law/public-web:0.1.1
           imagePullPolicy: IfNotPresent
           ports: [{ containerPort: 3000 }]
 ---
@@ -34,7 +34,7 @@ spec:
     spec:
       containers:
         - name: web
-          image: localhost:5000/law/attorney-web:0.1.3
+          image: localhost:5000/law/attorney-web:0.1.4
           imagePullPolicy: IfNotPresent
           ports: [{ containerPort: 3000 }]
           env:
