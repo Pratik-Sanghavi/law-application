@@ -38,6 +38,8 @@ spec:
           imagePullPolicy: IfNotPresent
           ports: [{ containerPort: 3000 }]
           env:
+            - name: APP_BASE_URL
+              value: http://localhost:3001
             - {
                 name: ATTORNEY_API_URL,
                 value: http://attorney-api.law-application.svc.cluster.local:8001,
