@@ -39,7 +39,7 @@ export default function Page() {
   return (
     <div className="shell">
       <header className="topbar">
-        <span className="brand">Pratik Sanghavi Law</span>
+        <span className="brand">Almanac</span>
         <form action="/api/auth/logout" method="post">
           <button className="button secondary">Log out</button>
         </form>
@@ -47,9 +47,10 @@ export default function Page() {
       <div className="toolbar">
         <div>
           <div className="eyebrow">Attorney workspace</div>
-          <h1>Candidate leads</h1>
+          <h1>Immigration leads</h1>
           <p className="muted">
-            Review applications and keep outreach status current.
+            Review prospective-client inquiries and keep outreach status
+            current.
           </p>
         </div>
         <button className="button secondary" onClick={load}>
@@ -60,7 +61,7 @@ export default function Page() {
       <section className="card table-wrap">
         {leads.length === 0 ? (
           <div className="empty">
-            No leads yet. New applications will appear here.
+            No leads yet. New immigration inquiries will appear here.
           </div>
         ) : (
           <table className="table">

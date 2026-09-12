@@ -26,15 +26,15 @@ export default function Page() {
     return (
       <div className="shell">
         <div className="success card">
-          <div className="success-icon">✓</div>
+          <div className="success-icon">âœ“</div>
           <div className="eyebrow">Application received</div>
-          <h1>Thank you for applying.</h1>
+          <h1>Thank you for reaching out.</h1>
           <p className="muted">
             Your details and resume are safely with our team. We will be in
             touch if there is a good fit.
           </p>
           <button className="button secondary" onClick={() => setDone(false)}>
-            Submit another application
+            Submit another inquiry
           </button>
         </div>
       </div>
@@ -42,12 +42,12 @@ export default function Page() {
   return (
     <div className="shell">
       <header className="topbar">
-        <span className="brand">Pratik Sanghavi Law</span>
+        <span className="brand">Almanac</span>
         <span className="muted">Careers</span>
       </header>
       <section className="hero">
-        <div className="eyebrow">Join our team</div>
-        <h1>Start your next chapter with us.</h1>
+        <div className="eyebrow">Immigration guidance</div>
+        <h1>Navigate immigration with Almanac.</h1>
         <p>
           Tell us a little about yourself and upload your resume. It takes less
           than two minutes.
@@ -80,7 +80,7 @@ export default function Page() {
           PDF, DOC, or DOCX. Maximum file size: 10 MB.
         </p>
         <button className="button" disabled={sending}>
-          {sending ? "Submitting…" : "Submit application"}
+          {sending ? "Submittingâ€¦" : "Submit application"}
         </button>
         {error && <p className="notice">{error}</p>}
       </form>
