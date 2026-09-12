@@ -1,5 +1,6 @@
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from app.api.routes import router
 from app.core.config import Settings,get_settings
 from app.core.database import build_engine,build_session_factory
@@ -13,5 +14,5 @@ async def lifespan(app:FastAPI):
     try: yield
     finally: await engine.dispose()
 def create_app()->FastAPI:
-    application=FastAPI(title="Lead Intake API",version="0.2.0",lifespan=lifespan); application.include_router(router); return application
+    application=FastAPI(title="Lead Intake API",version="0.2.0",lifespan=lifespan); application.add_middleware(CORSMiddleware,allow_origins=["http://localhost:3000"],allow_methods=["POST","GET"],allow_headers=["*"]); application.include_router(router); return application
 app=create_app()

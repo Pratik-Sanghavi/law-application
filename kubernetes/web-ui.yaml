@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: public-web, namespace: law-application}
+spec:
+  replicas: 1
+  selector: {matchLabels: {app: public-web}}
+  template:
+    metadata: {labels: {app: public-web}}
+    spec:
+      containers:
+      - name: web
+        image: localhost:5000/law/public-web:0.1.0
+        imagePullPolicy: IfNotPresent
+        ports: [{containerPort: 3000}]
+---
+apiVersion: v1
+kind: Service
+metadata: {name: public-web, namespace: law-application}
+spec: {type: LoadBalancer, selector: {app: public-web}, ports: [{port: 3000, targetPort: 3000}]}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: attorney-web, namespace: law-application}
+spec:
+  replicas: 1
+  selector: {matchLabels: {app: attorney-web}}
+  template:
+    metadata: {labels: {app: attorney-web}}
+    spec:
+      containers:
+      - name: web
+        image: localhost:5000/law/attorney-web:0.1.0
+        imagePullPolicy: IfNotPresent
+        ports: [{containerPort: 3000}]
+        env:
+        - {name: ATTORNEY_API_URL, value: http://attorney-api.law-application.svc.cluster.local:8001}
+        envFrom:
+        - configMapRef: {name: lead-runtime-config}
+        - secretRef: {name: attorney-web-oidc-credentials}
+---
+apiVersion: v1
+kind: Service
+metadata: {name: attorney-web, namespace: law-application}
+spec: {type: LoadBalancer, selector: {app: attorney-web}, ports: [{port: 3001, targetPort: 3000}]}

@@ -3,3 +3,4 @@ kind: Kustomization
 resources:
   - lead-intake-api.yaml
   - attorney-api.yaml
+  - web-ui.yaml

@@ -1,2 +1,3 @@
+export const dynamic = 'force-dynamic';
 import {NextRequest,NextResponse} from "next/server";
 export async function GET(req:NextRequest){const t=req.cookies.get("access_token")?.value;if(!t)return new NextResponse("Unauthorized",{status:401});const r=await fetch(`${process.env.ATTORNEY_API_URL}/v1/leads`,{headers:{Authorization:`Bearer ${t}`}});return new NextResponse(await r.text(),{status:r.status,headers:{"Content-Type":"application/json"}})}
