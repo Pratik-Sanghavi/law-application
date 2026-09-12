@@ -1,60 +1,89 @@
 "use client";
 import { useState } from "react";
 export default function Page() {
-  const [m, setM] = useState("");
+  const [done, setDone] = useState(false);
+  const [error, setError] = useState("");
+  const [sending, setSending] = useState(false);
   async function submit(e: any) {
     e.preventDefault();
-    setM("Submitting...");
+    setSending(true);
+    setError("");
     const r = await fetch(
       process.env.NEXT_PUBLIC_INTAKE_API_URL ||
         "http://localhost:8000/v1/leads",
       { method: "POST", body: new FormData(e.currentTarget) },
     );
-    setM(
-      r.ok
-        ? "Thank you. We received your application."
-        : "Submission failed. Please try again.",
-    );
-    if (r.ok) e.currentTarget.reset();
+    setSending(false);
+    if (r.ok) {
+      setDone(true);
+      e.currentTarget.reset();
+    } else
+      setError(
+        "We could not submit your application. Please try again in a moment.",
+      );
   }
+  if (done)
+    return (
+      <div className="shell">
+        <div className="success card">
+          <div className="success-icon">✓</div>
+          <div className="eyebrow">Application received</div>
+          <h1>Thank you for applying.</h1>
+          <p className="muted">
+            Your details and resume are safely with our team. We will be in
+            touch if there is a good fit.
+          </p>
+          <button className="button secondary" onClick={() => setDone(false)}>
+            Submit another application
+          </button>
+        </div>
+      </div>
+    );
   return (
-    <main>
-      <h1>Apply with us</h1>
-      <form onSubmit={submit}>
-        <label>
+    <div className="shell">
+      <header className="topbar">
+        <span className="brand">Pratik Sanghavi Law</span>
+        <span className="muted">Careers</span>
+      </header>
+      <section className="hero">
+        <div className="eyebrow">Join our team</div>
+        <h1>Start your next chapter with us.</h1>
+        <p>
+          Tell us a little about yourself and upload your resume. It takes less
+          than two minutes.
+        </p>
+      </section>
+      <form className="card form-card" onSubmit={submit}>
+        <label className="field">
           First name
-          <input name="first_name" required />
+          <input className="input" name="first_name" required />
         </label>
-        <label>
+        <label className="field">
           Last name
-          <input name="last_name" required />
+          <input className="input" name="last_name" required />
         </label>
-        <label>
-          Email
-          <input name="email" type="email" required />
+        <label className="field">
+          Email address
+          <input className="input" name="email" type="email" required />
         </label>
-        <label>
-          Resume / CV
-          <input name="resume" type="file" accept=".pdf,.doc,.docx" required />
+        <label className="field">
+          Resume or CV
+          <input
+            className="input"
+            name="resume"
+            type="file"
+            accept=".pdf,.doc,.docx"
+            required
+          />
         </label>
-        <button>Submit application</button>
+        <p className="muted" style={{ fontSize: 13 }}>
+          PDF, DOC, or DOCX. Maximum file size: 10 MB.
+        </p>
+        <button className="button" disabled={sending}>
+          {sending ? "Submitting…" : "Submit application"}
+        </button>
+        {error && <p className="notice">{error}</p>}
       </form>
-      <p>{m}</p>
-      <style jsx>{`
-        label {
-          display: block;
-          margin: 14px 0;
-        }
-        input {
-          display: block;
-          width: 100%;
-          padding: 8px;
-          margin-top: 4px;
-        }
-        button {
-          padding: 10px;
-        }
-      `}</style>
-    </main>
+    </div>
   );
 }

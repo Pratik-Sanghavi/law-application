@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: api
-          image: localhost:5000/law/attorney-api:0.1.0
+          image: localhost:5000/law/attorney-api:0.1.1
           imagePullPolicy: IfNotPresent
           ports:
             - name: http
@@ -25,13 +25,15 @@ spec:
                 name: attorney-api-db-credentials
             - configMapRef:
                 name: lead-runtime-config
+            - secretRef:
+                name: lead-api-s3-credentials
           readinessProbe:
-            httpGet: {path: /readyz, port: http}
+            httpGet: { path: /readyz, port: http }
           livenessProbe:
-            httpGet: {path: /healthz, port: http}
+            httpGet: { path: /healthz, port: http }
           resources:
-            requests: {cpu: 100m, memory: 128Mi}
-            limits: {cpu: 500m, memory: 512Mi}
+            requests: { cpu: 100m, memory: 128Mi }
+            limits: { cpu: 500m, memory: 512Mi }
 ---
 apiVersion: v1
 kind: Service
