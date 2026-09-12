@@ -1,3 +1,3 @@
-﻿# Argo CD app-of-apps
+﻿# law-application
 
-Apply `argocd/root-application.yaml` once the repository credential is registered in Argo CD. Future application manifests belong in `argocd/applications/`.
+Application workload manifests will be added under `kubernetes/`. Argo CD is configured from the separate `common_infra` repository to watch this directory.
