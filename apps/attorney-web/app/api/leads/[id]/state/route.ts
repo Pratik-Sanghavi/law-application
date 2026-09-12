@@ -1,0 +1,2 @@
+import {NextRequest,NextResponse} from "next/server";
+export async function PATCH(req:NextRequest,{params}:{params:{id:string}}){const t=req.cookies.get("access_token")?.value;if(!t)return new NextResponse("Unauthorized",{status:401});const r=await fetch(`${process.env.ATTORNEY_API_URL}/v1/leads/${params.id}/state`,{method:"PATCH",headers:{Authorization:`Bearer ${t}`,"Content-Type":"application/json"},body:await req.text()});return new NextResponse(await r.text(),{status:r.status,headers:{"Content-Type":"application/json"}})}
