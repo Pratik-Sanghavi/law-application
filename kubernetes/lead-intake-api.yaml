@@ -14,7 +14,7 @@ spec:
       restartPolicy: OnFailure
       containers:
         - name: migrate
-          image: localhost:5000/law/lead-intake-api:0.1.1
+          image: localhost:5000/law/lead-intake-api:0.1.2
           imagePullPolicy: IfNotPresent
           command: ["alembic", "upgrade", "head"]
           envFrom:
@@ -38,7 +38,7 @@ spec:
     spec:
       containers:
         - name: api
-          image: localhost:5000/law/lead-intake-api:0.1.1
+          image: localhost:5000/law/lead-intake-api:0.1.2
           imagePullPolicy: IfNotPresent
           ports:
             - name: http

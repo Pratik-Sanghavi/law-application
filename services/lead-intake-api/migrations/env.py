@@ -14,7 +14,7 @@ target_metadata = Base.metadata
 
 
 def database_url() -> str:
-    return get_settings().database_url.replace("postgresql+asyncpg://", "postgresql+psycopg://")
+    return (get_settings().database_url.replace("postgresql+asyncpg://", "postgresql+psycopg://").replace("?ssl=", "?sslmode="))
 
 
 def run_migrations_offline() -> None:
