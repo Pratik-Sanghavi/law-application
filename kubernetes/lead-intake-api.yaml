@@ -1,0 +1,87 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: lead-intake-api-migrate
+  namespace: law-application
+  annotations:
+    argocd.argoproj.io/hook: Sync
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation,HookSucceeded
+    argocd.argoproj.io/sync-wave: "-1"
+spec:
+  backoffLimit: 4
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: migrate
+          image: kind-registry:5000/law/lead-intake-api:0.1.1
+          imagePullPolicy: Always
+          command: ["alembic", "upgrade", "head"]
+          envFrom:
+            - secretRef:
+                name: attorney-api-db-credentials
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: lead-intake-api
+  namespace: law-application
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: lead-intake-api
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: lead-intake-api
+    spec:
+      containers:
+        - name: api
+          image: kind-registry:5000/law/lead-intake-api:0.1.1
+          imagePullPolicy: Always
+          ports:
+            - name: http
+              containerPort: 8000
+          env:
+            - name: ENVIRONMENT
+              value: local
+          envFrom:
+            - secretRef:
+                name: lead-intake-db-credentials
+            - secretRef:
+                name: lead-api-s3-credentials
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: http
+            initialDelaySeconds: 3
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: lead-intake-api
+  namespace: law-application
+spec:
+  type: LoadBalancer
+  selector:
+    app.kubernetes.io/name: lead-intake-api
+  ports:
+    - name: http
+      port: 8000
+      targetPort: http
+      protocol: TCP
