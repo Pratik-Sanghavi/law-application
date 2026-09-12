@@ -15,7 +15,7 @@ export async function GET(req: NextRequest) {
     client_secret: process.env.OIDC_CLIENT_SECRET!,
   });
   const t = await fetch(
-    `${process.env.OIDC_ISSUER_URL}/protocol/openid-connect/token`,
+    `${process.env.OIDC_TOKEN_URL || process.env.OIDC_ISSUER_URL}/protocol/openid-connect/token`,
     { method: "POST", body: b },
   );
   if (!t.ok) return new NextResponse("Login failed", { status: 502 });
