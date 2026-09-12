@@ -16,7 +16,7 @@ depends_on = None
 
 
 def upgrade() -> None:
-    lead_state = sa.Enum("PENDING", "REACHED_OUT", name="lead_state")
+    lead_state = postgresql.ENUM("PENDING", "REACHED_OUT", name="lead_state", create_type=False)
     lead_state.create(op.get_bind(), checkfirst=True)
     op.create_table(
         "leads",
