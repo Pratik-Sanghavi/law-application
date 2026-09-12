@@ -6,7 +6,7 @@ export function GET(req: NextRequest) {
     `${process.env.OIDC_ISSUER_URL}/protocol/openid-connect/auth`,
   );
   u.searchParams.set("client_id", process.env.OIDC_CLIENT_ID!);
-  u.searchParams.set("redirect_uri", `${req.nextUrl.origin}/api/auth/callback`);
+  u.searchParams.set("redirect_uri", `${process.env.APP_BASE_URL || req.nextUrl.origin}/api/auth/callback`);
   u.searchParams.set("response_type", "code");
   u.searchParams.set("scope", "openid profile email");
   u.searchParams.set("state", state);

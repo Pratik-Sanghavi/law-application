@@ -10,7 +10,7 @@ export async function GET(req: NextRequest) {
   const b = new URLSearchParams({
     grant_type: "authorization_code",
     code,
-    redirect_uri: `${req.nextUrl.origin}/api/auth/callback`,
+    redirect_uri: `${process.env.APP_BASE_URL || req.nextUrl.origin}/api/auth/callback`,
     client_id: process.env.OIDC_CLIENT_ID!,
     client_secret: process.env.OIDC_CLIENT_SECRET!,
   });
