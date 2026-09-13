@@ -1,46 +1,57 @@
 "use client";
-import { useState } from "react";
+
+import { FormEvent, useState } from "react";
+
 export default function Page() {
   const [done, setDone] = useState(false);
   const [error, setError] = useState("");
   const [sending, setSending] = useState(false);
-  async function submit(e: any) {
-    e.preventDefault();
+
+  async function submit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
     setSending(true);
     setError("");
-    const r = await fetch(
-      process.env.NEXT_PUBLIC_INTAKE_API_URL ||
-        "http://localhost:8000/v1/leads",
-      { method: "POST", body: new FormData(e.currentTarget) },
-    );
-    setSending(false);
-    if (r.ok) {
+
+    try {
+      const response = await fetch(
+        process.env.NEXT_PUBLIC_INTAKE_API_URL ||
+          "http://localhost:8000/v1/leads",
+        { method: "POST", body: new FormData(event.currentTarget) },
+      );
+
+      if (!response.ok) {
+        throw new Error("Submission failed");
+      }
+
+      event.currentTarget.reset();
       setDone(true);
-      e.currentTarget.reset();
-    } else
+    } catch {
       setError(
         "We could not submit your application. Please try again in a moment.",
       );
+    } finally {
+      setSending(false);
+    }
   }
-  if (done)
+
+  if (done) {
     return (
-      <div className="shell">
-        <div className="success card">
-          <div className="success-icon">Ã¢Å“â€œ</div>
-          <div className="eyebrow">Application received</div>
-          <h1>Thank you for reaching out.</h1>
+      <main className="shell">
+        <section className="success card" aria-live="polite">
+          <div className="success-icon" aria-hidden="true">
+            &#10003;
+          </div>
+          <h1>Your submission has been recorded.</h1>
           <p className="muted">
-            Your details and resume are safely with our team. We will be in
-            touch if there is a good fit.
+            One of our attorneys will get in touch with you soon.
           </p>
-          <button className="button secondary" onClick={() => setDone(false)}>
-            Submit another inquiry
-          </button>
-        </div>
-      </div>
+        </section>
+      </main>
     );
+  }
+
   return (
-    <div className="shell">
+    <main className="shell">
       <header className="topbar">
         <span className="brand">Almanac</span>
       </header>
@@ -48,8 +59,8 @@ export default function Page() {
         <div className="eyebrow">Immigration guidance</div>
         <h1>Navigate immigration with Almanac.</h1>
         <p>
-          Tell us a little about yourself and upload your resume. It takes less
-          than two minutes.
+          Share your details and resume so our immigration team can understand
+          how to help.
         </p>
       </section>
       <form className="card form-card" onSubmit={submit}>
@@ -79,10 +90,10 @@ export default function Page() {
           PDF, DOC, or DOCX. Maximum file size: 10 MB.
         </p>
         <button className="button" disabled={sending}>
-          {sending ? "SubmittingÃ¢â‚¬Â¦" : "Submit application"}
+          {sending ? "Submitting..." : "Submit application"}
         </button>
         {error && <p className="notice">{error}</p>}
       </form>
-    </div>
+    </main>
   );
 }
