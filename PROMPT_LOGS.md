@@ -1,64 +1,97 @@
-# Representative Prompt Logs
+# Planning Session Excerpts
 
-## 1. Scope and architecture
+Selected verbatim excerpts from the local planning session that initiated this application. Editorial omissions are marked with `[...]`; credentials, tokens, and private operational data are excluded.
 
-> Develop an application to support creating, getting and updating leads. A lead is a publicly available form for prospects to fill in with first name, last name, email, and resume/CV. After submission, notify the prospect and an attorney. Provide an authenticated internal UI where attorneys can review leads and mark them as reached out.
+Source transcript: `C:\Users\Pratik Sanghavi\.codex\sessions\2026\09\12\rollout-2026-09-12T11-49-25-01a096f3-f52b-7b32-8524-7b91dd8dc3da.jsonl`.
 
-**Outcome:** The solution was split into a public Next.js lead form, a FastAPI intake service, an authenticated Next.js attorney dashboard, and a FastAPI attorney service. PostgreSQL stores lead metadata and workflow state; MinIO stores CVs; Keycloak provides OIDC authentication and role-based access; Mailgun sends transactional email.
+## Problem statement and planning constraints
 
-## 2. Infrastructure-first decision
+**User**
 
-> We already use Postgres for data. First accumulate all common infrastructure before working on applications. We will also need internal users and database roles.
+> Develop an application to support creating, getting and updating leads. A lead is a form PUBLICLY available for prospects to fill in, the required fields include,
+>
+> first name
+>
+> last name
+>
+> email
+>
+> resume / CV
+>
+> Once the lead is submitted by a prospect, the application will send emails to both the prospect and an attorney inside the company.
+>
+> In addition, the application powers an internal UI guarded by auth to render a list of leads with all the information filled in by the prospect. Each lead also has a state, it starts with a PENDING state and transitions to REACHED_OUT when marked manually by an attorney after he / she reaches out to the prospect.
+>
+> Tech Requirements
+>
+> Create a system design to fulfill the above requirements
+>
+> Develop the web app & APIs E2E using coding agents of your choice
+>
+> The APIs need to be implemented using FastAPI and the web app using NextJS
+>
+> Add a storage to persist data and integrate with an email service
+>
+> Properly structure the code similar to how you would for a production level repo This is the problem statement and tech requirements. What I'm thinking is using mailgun and minio for the resume storage. We're in the plan mode. In the law application repository create a new folder for all the design documentation. We will write the PRD and HLD. Please lets first clarify scope. We already use postgres for the data. What i want is for us to first accumulate all the common infra before we start working on the applications themselves. Remember internal ui is guarded by auth so we'll have a set of internal users as well in addition to the public form to gather leads so the schema will evolve that way. Lets first clarify my thought process
 
-**Outcome:** Shared infrastructure was provisioned through Argo CD: CloudNativePG/PostgreSQL, MinIO, Keycloak, local container registry, and supporting namespaces. Database credentials were scoped to the intake service, attorney API, Keycloak, and the previously considered notification service.
+**Assistant**
 
-## 3. Simplified notification design
+> I'll keep this at the infrastructure-and-design stage for now: first ground the existing `law-application` repository and shared platform, then pin down product boundaries before proposing the PRD/HLD and infrastructure plan. I won't create files or deploy anything while we're in plan mode.
 
-> Cut down scope. We will not have a Temporal worker. Trigger email from the backends directly and wait for success with reasonable retries.
+## Initial architecture agreement
 
-**Outcome:** The lead intake API persists the lead and CV first, then sends prospect acknowledgement and attorney-alert emails using Mailgun. Each delivery uses bounded retry logic. The v1 design intentionally does not claim exactly-once email delivery.
+**Assistant**
 
-## 4. Private repository access for GitOps
+> The platform has no ingress controller, Keycloak, MinIO, or mail component yet. PostgreSQL and Temporal are healthy, so the clean plan is to add the remaining shared services to `common_infra`, then build application code only after those contracts are documented.
+>
+> One platform decision matters for proper separation: use the existing CloudNativePG cluster but give each stateful service its own database and credentials—`law_leads` for the FastAPI service and `keycloak` for Keycloak—rather than sharing the existing generic `app` user.
 
-> How do I configure Argo CD to watch private repositories?
+**Assistant**
 
-**Outcome:** Argo CD repository credentials were configured separately from application manifests. Application definitions point to the private application and infrastructure repositories while credentials remain Kubernetes secrets rather than committed configuration.
+> That split makes sense, with one important refinement:
+>
+> - `lead-intake-api` is anonymous and gets only the `leads` database credential; it creates leads, stores the CV in MinIO, and starts the Temporal notification workflow.
+> - `attorney-api` requires a Keycloak access token and gets its own `leads` database credential for read/update operations. It does not need direct credentials to Keycloak's user database—Keycloak owns identity storage and embeds the attorney/admin role in OIDC tokens.
+> - Keycloak alone connects to its own `keycloak` database. We disable public self-registration and create internal users administratively.
+>
+> That delivers the separation you want without letting either application API read password hashes or Keycloak tables.
 
-## 5. Large CloudNativePG CRD reconciliation failure
+## Proposed implementation plan
 
-> CustomResourceDefinition is invalid: metadata.annotations: Too long.
+**Assistant**
 
-**Outcome:** The Argo CD application was configured to use server-side apply for the CloudNativePG chart. This avoids client-side apply annotations exceeding the Kubernetes annotation size limit when applying large CRDs.
+> Build a local Kubernetes-hosted lead platform with:
+>
+> - Public Next.js form for first name, last name, email, and CV upload.
+> - Separate internal Next.js attorney dashboard protected by Keycloak OIDC.
+> - Two FastAPI services: a least-privilege public intake API and an authenticated attorney API.
+> - PostgreSQL lead data, private MinIO CV storage, Mailgun email delivery, and Temporal-based reliable notification workflows.
+> - Argo CD deployment from `law-application/kubernetes`, while `common_infra` continues to own shared infrastructure and the Argo watcher.
+>
+> Before application code, create `law-application/docs/PRD.md` and `law-application/docs/HLD.md`, then provision all shared dependencies in `common_infra`.
 
-## 6. Local image registry troubleshooting
+## Plan-to-implementation transition
 
-> Failed to pull image from localhost:5000 through the registry mirror.
+**User**
 
-**Outcome:** Images are pushed to the local registry and also imported into the Docker Desktop Kubernetes node containerd cache. Deployments use `imagePullPolicy: IfNotPresent`, which keeps local development reliable when the registry mirror is unavailable.
+> lets add this in a docs folder in the law application: C:\Users\Pratik Sanghavi\Desktop\Projects\k8s_projects\law-application
 
-## 7. OIDC callback and logout
+**Assistant**
 
-> Invalid parameter: redirect_uri.
+> I can add `docs/PRD.md` and `docs/HLD.md` under `law-application` once we leave Plan Mode. The proposed plan already specifies their contents; Plan Mode prevents me from creating files yet.
 
-**Outcome:** The attorney web client uses a stable external base URL (`http://localhost:3001`) for redirect URI construction while using internal Kubernetes service URLs for server-to-server token exchange. Logout clears local session cookies, performs a `303 See Other`, and calls Keycloak's end-session endpoint before returning to the dashboard URL.
+**User**
 
-## 8. Public lead submission debugging
+> lets leave plan mode then...
 
-> The browser network panel shows `201 Created`, but the UI still says it could not submit the application.
+**Assistant**
 
-**Outcome:** The API had successfully persisted the lead. The issue was client-side: the React event target was used after an asynchronous request. The handler now captures `FormData` synchronously before `await` and, after a successful response, immediately renders the confirmation screen. The intake API also sets explicit CORS rules for the local public UI origin.
+> I'll create the design docs in `law-application` now, based on the agreed architecture, and leave application implementation for the next step.
 
-## 9. Attorney dashboard freshness
+## Later scope correction
 
-> Refresh and marking a lead reached out do not show the new status unless using an incognito session.
+**User**
 
-**Outcome:** The attorney client fetches lead data with `cache: "no-store"`; the Next.js lead proxy fetch and response also disable caching. This makes the Refresh action and status update reflect the current PostgreSQL state in the same browser session.
+> also lets cut down scope. We won't have a temporal worker. Rather lets just trigger the email from the backends itself and then wait for success (retry reasonably). We will also update the HLD/PRD as needecxd
 
-## Validation checklist
-
-- Public submission returns `201 Created` and creates a `PENDING` lead in PostgreSQL.
-- Resume is stored in the private MinIO bucket.
-- Prospect and attorney notification requests are sent through Mailgun.
-- An authenticated attorney can list leads, download a CV, and transition a lead to `REACHED_OUT`.
-- Attorney logout ends the local and Keycloak sessions.
-- Public and attorney interfaces run from locally built images deployed through GitOps.
+The implemented design follows this later scope decision: the intake API sends email directly with bounded retries rather than using a Temporal worker.
