@@ -1,7 +1,5 @@
 # Representative Prompt Logs
 
-This document contains representative, sanitized excerpts from the implementation sessions for the Lead Management Platform. It is intended to show the reasoning, scope decisions, and debugging approach used during development. Credentials, tokens, personal secrets, and raw customer data are excluded.
-
 ## 1. Scope and architecture
 
 > Develop an application to support creating, getting and updating leads. A lead is a publicly available form for prospects to fill in with first name, last name, email, and resume/CV. After submission, notify the prospect and an attorney. Provide an authenticated internal UI where attorneys can review leads and mark them as reached out.
