@@ -26,7 +26,7 @@ export default function Page() {
     return (
       <div className="shell">
         <div className="success card">
-          <div className="success-icon">âœ“</div>
+          <div className="success-icon">Ã¢Å“â€œ</div>
           <div className="eyebrow">Application received</div>
           <h1>Thank you for reaching out.</h1>
           <p className="muted">
@@ -43,7 +43,6 @@ export default function Page() {
     <div className="shell">
       <header className="topbar">
         <span className="brand">Almanac</span>
-        <span className="muted">Careers</span>
       </header>
       <section className="hero">
         <div className="eyebrow">Immigration guidance</div>
@@ -80,7 +79,7 @@ export default function Page() {
           PDF, DOC, or DOCX. Maximum file size: 10 MB.
         </p>
         <button className="button" disabled={sending}>
-          {sending ? "Submittingâ€¦" : "Submit application"}
+          {sending ? "SubmittingÃ¢â‚¬Â¦" : "Submit application"}
         </button>
         {error && <p className="notice">{error}</p>}
       </form>
