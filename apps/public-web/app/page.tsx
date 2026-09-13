@@ -9,7 +9,7 @@ export default function Page() {
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const form = event.currentTarget;
+    const formData = new FormData(event.currentTarget);
     setSending(true);
     setError("");
 
@@ -17,14 +17,12 @@ export default function Page() {
       const response = await fetch(
         process.env.NEXT_PUBLIC_INTAKE_API_URL ||
           "http://localhost:8000/v1/leads",
-        { method: "POST", body: new FormData(form) },
+        { method: "POST", body: formData },
       );
 
       if (!response.ok) {
         throw new Error("Submission failed");
       }
-
-      form.reset();
       setDone(true);
     } catch {
       setError(
