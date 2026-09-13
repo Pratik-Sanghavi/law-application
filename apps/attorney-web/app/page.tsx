@@ -13,7 +13,7 @@ export default function Page() {
   const [leads, setLeads] = useState<Lead[]>([]);
   const [error, setError] = useState("");
   async function load() {
-    const r = await fetch("/api/leads");
+    const r = await fetch("/api/leads", { cache: "no-store" });
     if (r.status === 401) {
       location.href = "/api/auth/login";
       return;
