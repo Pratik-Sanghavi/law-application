@@ -1,4 +1,4 @@
-# Lead Management Platform â€” Product Requirements Document
+# Lead Management Platform Product Requirements Document
 
 ## Purpose
 
