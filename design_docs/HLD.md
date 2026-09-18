@@ -1,4 +1,4 @@
-# Lead Management Platform ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â High-Level Design
+# Lead Management Platform High-Level Design
 
 ## Architecture
 
