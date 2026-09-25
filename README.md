@@ -1,7 +1,7 @@
 # Lead Management Platform
 
 This application fulfils the lead-intake assignment: a public Next.js form creates a `PENDING` lead with a CV, sends notifications through Mailgun, and an authenticated attorney dashboard can review the lead and mark it `REACHED_OUT`. The APIs are FastAPI services. Kubernetes manifests for the workload are in `kubernetes/`; shared platform services are managed by the sibling `common_infra` repository through Argo CD.
-
+asdfas
 ## Why these platform services
 
 | Service | Responsibility in this application | Why it fits |
